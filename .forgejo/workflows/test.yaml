@@ -26,5 +26,8 @@ jobs:
       - name: Add zig to $PATH
         run: echo "/usr/local/zig" >> $FORGEJO_PATH
 
+      - name: Check formatting
+        run: zig fmt --check .
+
       - name: Run tests
         run: zig build test --summary all
