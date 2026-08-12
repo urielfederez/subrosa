@@ -1,0 +1,27 @@
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+
+      - name: Cache Zig
+        id: cache-zig
+        uses: actions/cache@v6
+        with:
+          path: /usr/local/zig
+          key: zig-x86_64-linux-0.16.0
+
+      - name: Install Zig
+        if: steps.cache-zig.outputs.cache-hit != 'true'
+        run: |
+          curl -L https://ziglang.org/download/0.16.0/zig-x86_64-linux-0.16.0.tar.xz | tar -xJ
+          mv zig-x86_64-linux-0.16.0 /usr/local/zig
+
+      - name: Add zig to $PATH
+        run: echo "/usr/local/zig" >> $FORGEJO_PATH
+
+      - name: Run tests
+        run: zig build test --summary all

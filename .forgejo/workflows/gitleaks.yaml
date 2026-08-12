@@ -1,0 +1,13 @@
+on: [push, pull_request]
+
+jobs:
+  gitleaks:
+    runs-on: docker
+    container:
+      # https://github.com/gitleaks/gitleaks#installing
+      image: docker.io/zricethezav/gitleaks:latest
+    steps:
+      - name: Clone repository
+        run: |
+          git clone ${{ github.server_url }}/${{ github.repository }}.git .
+      - run: gitleaks detect --source . --verbose --exit-code 1
