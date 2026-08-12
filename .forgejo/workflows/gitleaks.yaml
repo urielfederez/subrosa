@@ -1,4 +1,7 @@
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
   gitleaks:
@@ -10,4 +13,14 @@ jobs:
       - name: Clone repository
         run: |
           git clone ${{ github.server_url }}/${{ github.repository }}.git .
-      - run: gitleaks detect --source . --verbose --exit-code 1
+
+      - name: Run gitleaks (push)
+        if: github.event_name == 'push'
+        run: |
+          gitleaks detect --source . --verbose --exit-code 1
+
+      - name: Run gitleaks (pull request)
+        if: github.event_name == 'pull_request'
+        run: |
+          gitleaks detect --source . --verbose --exit-code 1 \
+            --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
