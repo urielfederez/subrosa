@@ -4,8 +4,11 @@ on:
   pull_request:
 
 jobs:
-  test:
+  test-engine:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./engine
     steps:
       - name: Check out the repository
         uses: actions/checkout@v6
@@ -31,3 +34,18 @@ jobs:
 
       - name: Run tests
         run: zig build test --summary all
+
+  test-magic-generator:
+    runs-on: docker
+    defaults:
+      run:
+        working-directory: ./magic_generator
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Run tests
+        run: uv run pytest
